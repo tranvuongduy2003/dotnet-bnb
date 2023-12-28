@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    font-family: 'Epilogue', sans-serif;
+    height: auto;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.ant-collapse-header {
+    padding: 0 !important;
+}
+
+.ant-collapse-content-box {
+    padding-inline: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.sorted-by-select .ant-select-selection-item {
+    color: #00BDD6FF;
+    font-weight: 600;
+}
+
+.ant-radio-button-wrapper-checked {
+    background: #00BDD6FF !important;
+    border-color: #00BDD6FF !important;
+}
+
+.ant-radio-button-wrapper-checked::before {
+    background: #00BDD6FF !important;
+}
+
+.ant-radio-button-wrapper::before {
+    background: #00BDD6FF !important;
+}
+
+.ant-collapse-header {
+    align-items: center !important;
+}
