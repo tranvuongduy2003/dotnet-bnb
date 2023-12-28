@@ -11,20 +11,19 @@ export function RecommendedProductCard({ data }: RecommendedProductCardProps) {
 
   return (
     <div>
-      <Card
-        hoverable
-        size="small"
-        cover={
+      <div
+        className="grid grid-cols-2 overflow-hidden border border-solid rounded-md cursor-pointer border-neutral-200"
+        onClick={() => navigate(`product/${data.id}`)}
+      >
+        <div className="relative overflow-hidden min-h-64">
           <img
             src={data.images[0]}
             alt="product image"
-            className="object-cover h-48"
+            className="absolute top-0 bottom-0 left-0 right-0 object-cover w-full h-full"
           />
-        }
-        onClick={() => navigate(`product/${data.id}`)}
-      >
-        <div className="flex flex-col h-36">
-          <div className="flex-1">
+        </div>
+        <div className="flex flex-col p-8">
+          <div>
             <Typography.Title
               ellipsis={{ rows: 1 }}
               level={4}
@@ -49,7 +48,7 @@ export function RecommendedProductCard({ data }: RecommendedProductCardProps) {
             </Typography.Title>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

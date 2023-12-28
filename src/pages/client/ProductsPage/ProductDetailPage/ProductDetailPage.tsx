@@ -1,4 +1,4 @@
-import { getProductById } from "@/apis/product.api";
+import { getProductById, getRecommendedProducts } from "@/apis/product.api";
 import { useAppStore } from "@/stores/useAppStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useCartStore } from "@/stores/useCartStore";
@@ -21,6 +21,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Reviews from "./components/Reviews";
+import { RecommendedProductCard } from "@/components/RecommendedProductCard";
 
 const ProductDetailPage: React.FunctionComponent = () => {
   const navigate = useNavigate();
@@ -29,12 +30,15 @@ const ProductDetailPage: React.FunctionComponent = () => {
 
   const isLoading = useAppStore((state) => state.isLoading);
   const setIsLoading = useAppStore((state) => state.setIsLoading);
-  const product = useProductStore((state) => state.product);
-  const setProduct = useProductStore((state) => state.setProduct);
+  const { setRecommendedProducts, recommendedProducts, product, setProduct } =
+    useProductStore((state) => state);
 
   const [previewImage, setPreviewImage] = useState<string>();
+  const [recommendedProductsLoading, setRecommendedProductsLoading] =
+    useState<boolean>(false);
 
   const fetchProductData = useRef<any>();
+  const fetchRecommendedProductData = useRef<any>();
 
   useEffect(() => {
     fetchProductData.current = async () => {
@@ -51,6 +55,23 @@ const ProductDetailPage: React.FunctionComponent = () => {
       }
     };
     fetchProductData.current();
+  }, []);
+
+  useEffect(() => {
+    fetchRecommendedProductData.current = async () => {
+      setRecommendedProductsLoading(true);
+      try {
+        const { data: recommendedProductData } = await getRecommendedProducts();
+
+        setRecommendedProducts(recommendedProductData);
+        setRecommendedProductsLoading(false);
+      } catch (error) {
+        setRecommendedProductsLoading(false);
+        console.log(error);
+      }
+    };
+    fetchRecommendedProductData.current();
+    () => fetchRecommendedProductData.current;
   }, []);
 
   // quantity
@@ -206,6 +227,26 @@ const ProductDetailPage: React.FunctionComponent = () => {
       ) : (
         <Reviews productId={productId} />
       )}
+
+      <Row className="my-10">
+        <h2 className="text-3xl text-neutral-900">Related Products</h2>
+        <div className="grid grid-cols-2 gap-6">
+          {recommendedProductsLoading ? (
+            <>
+              <Skeleton className="h-[349px]" />
+              <Skeleton className="h-[349px]" />
+            </>
+          ) : (
+            recommendedProducts &&
+            recommendedProducts.length > 0 &&
+            recommendedProducts
+              .slice(2, 4)
+              .map((item) => (
+                <RecommendedProductCard key={item.id} data={item} />
+              ))
+          )}
+        </div>
+      </Row>
     </div>
   );
 };

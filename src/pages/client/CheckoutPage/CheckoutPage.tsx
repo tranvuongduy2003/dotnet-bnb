@@ -1,5 +1,5 @@
-import { Col, Form, Row, Typography, notification } from "antd";
-import React from "react";
+import { Col, Form, Row, Skeleton, Typography, notification } from "antd";
+import React, { useEffect, useRef, useState } from "react";
 import PaymentBill from "./components/PaymentBill";
 import OrderSummary from "./components/OrderSummary";
 import RecipientInformation from "./components/RecipientInformation";
@@ -9,6 +9,9 @@ import { addOrder } from "@/apis/order.api";
 import { useAppStore } from "@/stores/useAppStore";
 import { useCartStore } from "@/stores/useCartStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useProductStore } from "@/stores/useProductStore";
+import { getRecommendedProducts } from "@/apis/product.api";
+import { RecommendedProductCard } from "@/components/RecommendedProductCard";
 
 const CheckoutPage: React.FunctionComponent = () => {
   const navigate = useNavigate();
@@ -20,6 +23,32 @@ const CheckoutPage: React.FunctionComponent = () => {
   const setIsLoading = useAppStore((state) => state.setIsLoading);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const profile = useAuthStore((state) => state.profile);
+
+  const { setRecommendedProducts, recommendedProducts } = useProductStore(
+    (state) => state
+  );
+
+  const [recommendedProductsLoading, setRecommendedProductsLoading] =
+    useState<boolean>(false);
+
+  const fetchRecommendedProductData = useRef<any>();
+
+  useEffect(() => {
+    fetchRecommendedProductData.current = async () => {
+      setRecommendedProductsLoading(true);
+      try {
+        const { data: recommendedProductData } = await getRecommendedProducts();
+
+        setRecommendedProducts(recommendedProductData);
+        setRecommendedProductsLoading(false);
+      } catch (error) {
+        setRecommendedProductsLoading(false);
+        console.log(error);
+      }
+    };
+    fetchRecommendedProductData.current();
+    () => fetchRecommendedProductData.current;
+  }, []);
 
   const handlePay = async () => {
     setIsLoading(true);
@@ -72,6 +101,26 @@ const CheckoutPage: React.FunctionComponent = () => {
         <Col span={8}>
           <PaymentBill onPay={handlePay} orders={orders} />
         </Col>
+      </Row>
+
+      <Row className="my-10">
+        <h2 className="text-3xl text-neutral-900">Related Products</h2>
+        <div className="grid grid-cols-2 gap-6">
+          {recommendedProductsLoading ? (
+            <>
+              <Skeleton className="h-[349px]" />
+              <Skeleton className="h-[349px]" />
+            </>
+          ) : (
+            recommendedProducts &&
+            recommendedProducts.length > 0 &&
+            recommendedProducts
+              .slice(2, 4)
+              .map((item) => (
+                <RecommendedProductCard key={item.id} data={item} />
+              ))
+          )}
+        </div>
       </Row>
     </div>
   );

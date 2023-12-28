@@ -56,14 +56,14 @@ const ProductsPage: React.FunctionComponent = () => {
 
   useEffect(() => {
     fetchRecommendedProductData.current = async () => {
-      setIsLoading(true);
+      setRecommendedProductsLoading(true);
       try {
         const { data: recommendedProductData } = await getRecommendedProducts();
 
         setRecommendedProducts(recommendedProductData);
-        setIsLoading(false);
+        setRecommendedProductsLoading(false);
       } catch (error) {
-        setIsLoading(false);
+        setRecommendedProductsLoading(false);
         console.log(error);
       }
     };
@@ -163,20 +163,25 @@ const ProductsPage: React.FunctionComponent = () => {
         </Col>
       </Row>
 
-      <div className="grid grid-cols-2 gap-6">
-        {recommendedProductsLoading ? (
-          <>
-            <Skeleton className="h-[349px]" />
-            <Skeleton className="h-[349px]" />
-          </>
-        ) : (
-          recommendedProducts &&
-          recommendedProducts.length > 0 &&
-          recommendedProducts
-            .slice(0, 2)
-            .map((item) => <RecommendedProductCard key={item.id} data={item} />)
-        )}
-      </div>
+      <Row className="my-10 px-28">
+        <h2 className="text-3xl text-neutral-900">Related Products</h2>
+        <div className="grid grid-cols-2 gap-6">
+          {recommendedProductsLoading ? (
+            <>
+              <Skeleton className="h-[349px]" />
+              <Skeleton className="h-[349px]" />
+            </>
+          ) : (
+            recommendedProducts &&
+            recommendedProducts.length > 0 &&
+            recommendedProducts
+              .slice(0, 2)
+              .map((item) => (
+                <RecommendedProductCard key={item.id} data={item} />
+              ))
+          )}
+        </div>
+      </Row>
     </div>
   );
 };
